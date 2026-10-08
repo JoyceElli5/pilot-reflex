@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #080f17;
+  --foreground: #edf2f5;
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: #78d9e3;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+::selection { background: #78d9e3; color: #080f17; }
+
+:focus-visible { outline: 2px solid #78d9e3; outline-offset: 6px; }
+
+.eyebrow {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  line-height: 1.6;
+  letter-spacing: .16em;
+  color: #a1b6c3;
+}
+
+.nav-link { transition: color 160ms ease; }
+.nav-link:hover { color: #78d9e3; }
+.skip-link { position: fixed; top: 12px; left: 12px; z-index: 10; transform: translateY(-180%); background: #78d9e3; color: #080f17; padding: 12px 18px; }
+.skip-link:focus { transform: translateY(0); }
+#coming-soon:target { border-color: #78d9e3; }
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+  .hero-copy, .instrument { animation: arrive 700ms ease-out both; }
+  .instrument { animation-delay: 100ms; }
+  @keyframes arrive {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
 }
