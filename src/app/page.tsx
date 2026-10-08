@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const challenges = [
   { number: "01", title: "Visual Reaction", category: "SEE. REACT.", description: "A change of light. A moment to respond. Explore the time between seeing a cue and taking action.", icon: "visual" },
   { number: "02", title: "Signal Response", category: "NOTICE. DECIDE.", description: "Find the right cue among competing signals. Explore how a little decision-making changes your response.", icon: "signal" },
@@ -61,8 +63,8 @@ export default function Home() {
             <p className="eyebrow mb-7 flex items-center gap-3"><span className="h-1.5 w-1.5 bg-accent" /> AVIATION INSPIRED. CURIOSITY DRIVEN.</p>
             <h1 id="hero-title" className="text-[clamp(3.25rem,7vw,6.5rem)] leading-[.98] font-semibold tracking-[-.065em]">HOW FAST<br />CAN YOU<br /><span className="text-accent">REACT?</span></h1>
             <p className="mt-7 max-w-md text-base leading-7 text-slate-400 sm:text-lg">A split second sparks a decision.<br />Explore your reactions through challenges inspired by the focus of flight.</p>
-            <a href="#coming-soon" className="mt-9 inline-flex min-h-14 items-center gap-6 rounded-sm bg-accent px-6 text-sm font-semibold text-[#081219] transition-colors hover:bg-[#a0e7ed]" aria-describedby="launch-note">Start Challenge <span aria-hidden="true">↗</span></a>
-            <p id="launch-note" className="mt-3 font-mono text-xs text-slate-400">Coming soon · Preview the challenges below</p>
+            <Link href="/challenges/visual-reaction" className="mt-9 inline-flex min-h-14 items-center gap-6 rounded-sm bg-accent px-6 text-sm font-semibold text-[#081219] transition-colors hover:bg-[#a0e7ed]" aria-describedby="launch-note">Start Challenge <span aria-hidden="true">↗</span></Link>
+            <p id="launch-note" className="mt-3 font-mono text-xs text-slate-400">Visual Reaction · Five trials · Ready to play</p>
           </div>
           <Instrument />
         </section>
@@ -70,7 +72,7 @@ export default function Home() {
         <section id="challenges" aria-labelledby="challenges-title" className="scroll-mt-8 border-t border-white/10 pt-10 pb-14">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div><p className="eyebrow mb-3">THE CHALLENGES</p><h2 id="challenges-title" className="text-2xl font-medium tracking-tight sm:text-3xl">Three ways to meet the moment.</h2></div>
-            <span className="font-mono text-xs text-slate-400">01 — 03 / IN DEVELOPMENT</span>
+            <span className="font-mono text-xs text-slate-400">01 READY / 02 MORE IN DEVELOPMENT</span>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             {challenges.map((challenge) => (
@@ -79,15 +81,15 @@ export default function Home() {
                 <p className="mb-3 font-mono text-[10px] tracking-[.15em] text-slate-400">{challenge.category}</p>
                 <h3 className="mb-3 text-xl font-medium tracking-tight">{challenge.title}</h3>
                 <p className="text-sm leading-6 text-slate-400">{challenge.description}</p>
-                <div className="mt-7 border-t border-white/10 pt-4 font-mono text-[10px] tracking-[.12em] text-slate-400">COMING SOON</div>
+                <div className="mt-7 border-t border-white/10 pt-4 font-mono text-[10px] tracking-[.12em] text-slate-400">{challenge.icon === "visual" ? <Link href="/challenges/visual-reaction" className="nav-link inline-flex min-h-11 items-center text-accent">PLAY VISUAL REACTION <span aria-hidden="true" className="ml-2">↗</span></Link> : "COMING SOON"}</div>
               </article>
             ))}
           </div>
         </section>
 
         <section id="coming-soon" tabIndex={-1} aria-labelledby="launch-title" className="mb-14 flex scroll-mt-8 flex-col gap-4 border-y border-white/10 py-7 sm:flex-row sm:items-center sm:justify-between">
-          <div><p className="eyebrow mb-2">ON THE HORIZON</p><h2 id="launch-title" className="text-xl font-medium">Your next challenge is preparing for takeoff.</h2></div>
-          <p className="max-w-sm text-sm leading-6 text-slate-400">Challenges are coming soon and are not playable yet. This is a first look at Pilot Reflex.</p>
+          <div><p className="eyebrow mb-2">ON THE HORIZON</p><h2 id="launch-title" className="text-xl font-medium">More challenges are preparing for takeoff.</h2></div>
+          <p className="max-w-sm text-sm leading-6 text-slate-400">Visual Reaction is ready to play. Signal Response and Focus Challenge are still in development.</p>
         </section>
       </main>
 

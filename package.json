@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --require ./tests/register-typescript.cjs --test tests/*.test.cjs"
   },
   "dependencies": {
     "next": "16.4.0",
