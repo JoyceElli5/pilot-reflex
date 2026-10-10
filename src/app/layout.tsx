@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Pilot Reflex | How Fast Can You React?",
   description:
-    "Play Visual Reaction with Pilot Reflex. Aviation-inspired challenges for entertainment and education, not an official pilot aptitude or medical assessment.",
+    "Explore three aviation-inspired reaction, signal, and focus challenges for entertainment and education, not an official pilot aptitude or medical assessment.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
