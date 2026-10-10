@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pilot Reflex ✈️
+
+**Aviation-inspired reaction, attention, and focus challenges.**
+
+Pilot Reflex is a free browser-based game inspired by the mental focus and quick decision-making associated with aviation.
+
+Built as a personal software engineering project, it brings together my interests in flying, interactive experiences, and frontend development.
+
+**[🎮 Play Pilot Reflex](https://pilotreflex.joyceelli.com)**
+
+## Challenges
+
+### 1. Visual Reaction
+
+Test how quickly you respond to a visual signal.
+
+- Five attempts per session
+- Reaction time measured in milliseconds
+- Penalties for false starts and timeouts
+- Performance report with results across all attempts
+
+### 2. Signal Response
+
+Respond to the correct signal while ignoring distractions.
+
+- Five rounds per session
+- Aviation-inspired instructions
+- Correct, incorrect, and missed responses
+- Reaction time and accuracy reporting
+
+### 3. Focus Challenge
+
+Test your observation and short-term memory using flight instrument readings.
+
+- Observe four instrument readings
+- Identify which reading changed
+- Five rounds per session
+- Accuracy and decision-time reporting
+
+## Features
+
+- Three playable challenges
+- Mobile-friendly interface
+- Performance reports
+- Personal-best tracking in browser storage
+- No account required
+- Free to play
+
+## Built With
+
+- Next.js
+- React
+- TypeScript
+- CSS
+- Vercel
 
 ## Getting Started
 
-First, run the development server:
+Clone the repository:
+
+```bash
+git clone https://github.com/JoyceElli5/pilot-reflex.git
+cd pilot-reflex
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open the local URL displayed in your terminal.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+For a production build:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+## Why I Built It
 
-To learn more about Next.js, take a look at the following resources:
+As a software developer with a background in flight training, I wanted to create something that connected both interests.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Pilot Reflex started as a small idea and became an opportunity to work through practical engineering decisions involving scoring, timing, state management, responsive design, and user experience.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+One of the biggest lessons was that working software is not necessarily well-designed software. The scoring rules, feedback, and overall experience needed just as much thought as the implementation.
 
-## Deploy on Vercel
+## Disclaimer
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Pilot Reflex is intended for entertainment and educational exploration. It is not an official pilot aptitude test, medical assessment, or professional aviation training tool.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Author
+
+**Joyce Attawah Elli**
+
+- Portfolio: https://www.joyceelli.com
+- GitHub: https://github.com/JoyceElli5
+- Live project: https://pilotreflex.joyceelli.com
