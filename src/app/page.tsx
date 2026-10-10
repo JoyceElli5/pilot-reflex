@@ -3,7 +3,7 @@ import Link from "next/link";
 const challenges = [
   { number: "01", title: "Visual Reaction", category: "SEE. REACT.", description: "A change of light. A moment to respond. Explore the time between seeing a cue and taking action.", icon: "visual" },
   { number: "02", title: "Signal Response", category: "NOTICE. DECIDE.", description: "Find the right cue among competing signals. Explore how a little decision-making changes your response.", icon: "signal" },
-  { number: "03", title: "Focus Challenge", category: "SETTLE IN. STAY SHARP.", description: "Keep your attention on what matters. Explore the balance between a quick response and a considered one.", icon: "focus" },
+  { number: "03", title: "Focus Challenge", category: "SETTLE IN. STAY SHARP.", description: "Observe four instrument readings. Remember the details, then identify the one that changed.", icon: "focus" },
 ];
 
 function Instrument() {
@@ -72,7 +72,7 @@ export default function Home() {
         <section id="challenges" aria-labelledby="challenges-title" className="scroll-mt-8 border-t border-white/10 pt-10 pb-14">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div><p className="eyebrow mb-3">THE CHALLENGES</p><h2 id="challenges-title" className="text-2xl font-medium tracking-tight sm:text-3xl">Three ways to meet the moment.</h2></div>
-            <span className="font-mono text-xs text-slate-400">02 READY / 01 IN DEVELOPMENT</span>
+            <span className="font-mono text-xs text-slate-400">03 CHALLENGES / READY TO PLAY</span>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             {challenges.map((challenge) => (
@@ -81,15 +81,15 @@ export default function Home() {
                 <p className="mb-3 font-mono text-[10px] tracking-[.15em] text-slate-400">{challenge.category}</p>
                 <h3 className="mb-3 text-xl font-medium tracking-tight">{challenge.title}</h3>
                 <p className="text-sm leading-6 text-slate-400">{challenge.description}</p>
-                <div className="mt-7 border-t border-white/10 pt-4 font-mono text-[10px] tracking-[.12em] text-slate-400">{challenge.icon === "visual" ? <Link href="/challenges/visual-reaction" className="nav-link inline-flex min-h-11 items-center text-accent">PLAY VISUAL REACTION <span aria-hidden="true" className="ml-2">↗</span></Link> : challenge.icon === "signal" ? <Link href="/challenges/signal-response" className="nav-link inline-flex min-h-11 items-center text-accent">PLAY SIGNAL RESPONSE <span aria-hidden="true" className="ml-2">↗</span></Link> : "COMING SOON"}</div>
+                <div className="mt-7 border-t border-white/10 pt-4 font-mono text-[10px] tracking-[.12em] text-slate-400">{challenge.icon === "visual" ? <Link href="/challenges/visual-reaction" className="nav-link inline-flex min-h-11 items-center text-accent">PLAY VISUAL REACTION <span aria-hidden="true" className="ml-2">↗</span></Link> : challenge.icon === "signal" ? <Link href="/challenges/signal-response" className="nav-link inline-flex min-h-11 items-center text-accent">PLAY SIGNAL RESPONSE <span aria-hidden="true" className="ml-2">↗</span></Link> : <Link href="/challenges/focus-challenge" className="nav-link inline-flex min-h-11 items-center text-accent">PLAY FOCUS CHALLENGE <span aria-hidden="true" className="ml-2">↗</span></Link>}</div>
               </article>
             ))}
           </div>
         </section>
 
         <section id="coming-soon" tabIndex={-1} aria-labelledby="launch-title" className="mb-14 flex scroll-mt-8 flex-col gap-4 border-y border-white/10 py-7 sm:flex-row sm:items-center sm:justify-between">
-          <div><p className="eyebrow mb-2">ON THE HORIZON</p><h2 id="launch-title" className="text-xl font-medium">More challenges are preparing for takeoff.</h2></div>
-          <p className="max-w-sm text-sm leading-6 text-slate-400">Visual Reaction and Signal Response are ready to play. Focus Challenge is still in development.</p>
+          <div><p className="eyebrow mb-2">THE COLLECTION</p><h2 id="launch-title" className="text-xl font-medium">Three challenges. Three ways to focus.</h2></div>
+          <p className="max-w-sm text-sm leading-6 text-slate-400">Explore reaction speed, signal recognition, and short-term memory with Visual Reaction, Signal Response, and Focus Challenge.</p>
         </section>
       </main>
 
