@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { flushSync } from 'react-dom';
-import { ReactionGame, median, readBest, saveBest } from './game';
+import { ReactionGame, attemptScore, readBest } from './game';
 import { KeyLatch } from './input';
+import FlightReport from './flight-report';
+import { completeReport, outcomeLabel, type FlightReport as Report } from './report';
 
 const bestChanged = 'pilot-reflex-best-changed';
 function getBest() {
@@ -23,12 +25,14 @@ const actionClass = 'min-h-12 rounded-sm bg-accent px-6 py-3 text-sm font-semibo
 
 export default function VisualReaction() {
   const [game] = useState(() => new ReactionGame({
+    isAvailable: () => !document.hidden && document.hasFocus(),
     now: () => performance.now(),
     random: () => Math.random(),
     // Commit the green cue synchronously with activation, without a React transition.
     schedule: (callback, delay) => window.setTimeout(() => flushSync(callback), delay),
     cancel: token => window.clearTimeout(token),
   }));
+  const [report, setReport] = useState<Report | null>(null);
   const [keys] = useState(() => new KeyLatch());
   const state = useSyncExternalStore(game.subscribe, game.getSnapshot, game.getSnapshot);
   const best = useSyncExternalStore(subscribeBest, getBest, serverBest);
@@ -65,16 +69,18 @@ export default function VisualReaction() {
     };
   }, [game, keys]);
 
-  useEffect(() => {
-    if (state.phase !== 'complete') return;
-    try {
-      saveBest(window.localStorage, state);
-      window.dispatchEvent(new Event(bestChanged));
-    } catch { /* Storage may be disabled. The completed result stays available. */ }
-  }, [state]);
+  useEffect(() => game.subscribe(() => {
+    const completed = game.getSnapshot();
+    if (completed.phase !== 'complete') return;
+    let storage: Storage | null = null;
+    try { storage = window.localStorage; } catch { /* Browser storage may be disabled. */ }
+    // This runs once on completion, before the stored best is updated.
+    setReport(completeReport(completed, storage));
+    window.dispatchEvent(new Event(bestChanged));
+  }), [game]);
 
   function begin() {
-    game.beginTrial();
+    game.beginAttempt();
     target.current?.focus();
   }
   function restart() {
@@ -82,15 +88,30 @@ export default function VisualReaction() {
     start.current?.focus();
   }
 
+  function playAgain() {
+    flushSync(() => {
+      setReport(null);
+      game.restart();
+      game.beginAttempt();
+    });
+    target.current?.focus();
+  }
+
+  if (state.phase === 'complete' && report) {
+    return <FlightReport report={report} onPlayAgain={playAgain} />;
+  }
+
+  const lastAttempt = state.attempts.at(-1);
   const messages = {
     instructions: 'Ready when you are. Read the instructions, then start your session.',
-    waiting: `Trial ${state.times.length + 1} of 5. Wait for green.`,
+    waiting: `Attempt ${state.attempts.length + 1} of 5. Wait for green.`,
     active: 'GO — respond within 3 seconds!',
-    timeout: 'Timeout. The 3-second response window has closed. No reaction was recorded. Retry the same trial when ready.',
-    'false-start': 'Too early. This trial did not count. Retry when you are ready.',
-    result: `Trial ${state.times.length} recorded: ${formatTime(state.times.at(-1) ?? 0)}. Continue when ready.`,
-    interrupted: 'Trial paused because you left the page. Retry this trial; no penalty was added.',
-    complete: `Session complete. Median ${formatTime(median(state.times) ?? 0)}. Fastest ${formatTime(Math.min(...state.times))}. ${state.falseStarts} false starts. ${state.timeouts} timeouts.`,
+    timeout: lastAttempt?.kind === 'timeout' && lastAttempt.reason === 'interrupted'
+      ? 'Attempt interrupted. A timeout and 3,000 ms game-score penalty were recorded. Continue to the next attempt.'
+      : 'Timeout. This attempt scored a 3,000 ms penalty, not a reaction time. Continue to the next attempt.',
+    'false-start': 'False start. This attempt scored a 3,000 ms penalty. Continue to the next attempt.',
+    result: `Attempt ${state.attempts.length} recorded: ${formatTime(state.times.at(-1) ?? 0)}. Continue when ready.`,
+    complete: 'Five attempts complete. Your Flight Performance Report is ready.',
   };
 
   return (
@@ -100,20 +121,21 @@ export default function VisualReaction() {
         <ol className="mt-3 list-inside list-decimal space-y-2 text-sm leading-6 text-slate-300">
           <li>Start a session, then wait. The indicator stays red for a random 2–5 seconds.</li>
           <li>When it turns green and says GO, click or tap the reaction panel, or press Space before 3,000 ms (3 seconds) have elapsed.</li>
-          <li>Complete five valid trials. An early response adds a false start. Missing the 3-second window adds a timeout. Either requires a retry of the same trial.</li>
+          <li>You get exactly five attempts. A false start or timeout consumes an attempt and scores a 3,000 ms penalty. Valid reactions score their actual time.</li>
         </ol>
-        <p className="mt-3 text-xs leading-6 text-slate-400">Release the key between responses. Your score is the median of five trials; lower is faster.</p>
+        <p className="mt-3 text-xs leading-6 text-slate-400">Release the key between responses. Your game score is the median of all five scores, including penalties; lower is better. Switching tabs or leaving the window during a live attempt counts as a timeout. Restarting or leaving the challenge discards the unfinished session.</p>
       </section>
 
       <div className="mb-4 flex flex-wrap justify-between gap-3 font-mono text-xs text-slate-300">
-        <span>{state.times.length} / 5 VALID TRIALS</span>
+        <span>{state.attempts.length} / 5 ATTEMPTS</span>
+        <span>SUCCESSFUL / {state.times.length}</span>
         <span>FALSE STARTS / {state.falseStarts}</span>
         <span>TIMEOUTS / {state.timeouts}</span>
       </div>
       <button
         ref={target}
         type="button"
-        aria-label={state.phase === 'active' ? 'GO. Respond now' : state.phase === 'waiting' ? 'Wait for green. Reaction panel' : state.phase === 'timeout' ? 'Timeout. Use Retry trial to continue' : 'Reaction panel. Use the session controls below to continue'}
+        aria-label={state.phase === 'active' ? 'GO. Respond now' : state.phase === 'waiting' ? 'Wait for green. Reaction panel' : state.phase === 'timeout' ? 'Timeout. Use Next Attempt to continue' : 'Reaction panel. Use the session controls below to continue'}
         aria-disabled={!isLive}
         onPointerDown={event => {
           if (!event.isPrimary || event.button !== 0) return;
@@ -127,37 +149,24 @@ export default function VisualReaction() {
       >
         <span aria-hidden="true" className={`h-14 w-14 rounded-full border-4 ${state.phase === 'active' ? 'border-emerald-200 bg-emerald-400' : state.phase === 'waiting' ? 'border-red-200 bg-red-500' : state.phase === 'timeout' ? 'border-amber-200 bg-amber-400' : 'border-slate-500 bg-slate-700'}`} />
         <span className="text-3xl font-semibold tracking-[.12em]">{state.phase === 'active' ? 'GO' : state.phase === 'waiting' ? 'WAIT' : state.phase === 'complete' ? 'COMPLETE' : state.phase === 'false-start' ? 'TOO EARLY' : state.phase === 'timeout' ? 'TIMEOUT' : 'STAND BY'}</span>
-        <span className="text-sm text-slate-300">{isLive ? 'Click · Tap · Space' : 'Five trials. Stay curious.'}</span>
+        <span className="text-sm text-slate-300">{isLive ? 'Click · Tap · Space' : 'Five attempts. Stay curious.'}</span>
       </button>
       <p role="status" aria-live="polite" aria-atomic="true" className="mt-5 min-h-12 text-sm leading-6 text-slate-300">{messages[state.phase]}</p>
 
       <div className="mt-4 flex flex-wrap gap-4">
         {state.phase === 'instructions' && <button ref={start} type="button" className={actionClass} onClick={begin}>Start session</button>}
-        {['result', 'false-start', 'timeout', 'interrupted'].includes(state.phase) && <button type="button" className={actionClass} onClick={begin}>{state.phase === 'result' ? 'Next trial' : 'Retry trial'} {state.times.length + 1} / 5</button>}
+        {['result', 'false-start', 'timeout'].includes(state.phase) && <button type="button" className={actionClass} onClick={begin}>Next Attempt {state.attempts.length + 1} / 5</button>}
         {state.phase !== 'instructions' && <button type="button" className="min-h-12 rounded-sm border border-white/20 px-6 py-3 text-sm text-slate-200 hover:border-accent" onClick={restart}>Restart session</button>}
       </div>
 
-      {state.phase === 'complete' && (
-        <section aria-labelledby="results-title" className="mt-8 rounded-sm border border-accent/40 bg-[#0d1721] p-6">
-          <p className="eyebrow">SESSION DEBRIEF</p>
-          <h2 id="results-title" className="mt-2 text-2xl font-medium">Your results</h2>
-          <dl className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <div><dt className="text-sm text-slate-400">Median reaction</dt><dd className="mt-2 font-mono text-3xl text-accent">{formatTime(median(state.times)!)}</dd></div>
-            <div><dt className="text-sm text-slate-400">Fastest reaction</dt><dd className="mt-2 font-mono text-3xl">{formatTime(Math.min(...state.times))}</dd></div>
-            <div><dt className="text-sm text-slate-400">False starts</dt><dd className="mt-2 font-mono text-3xl">{state.falseStarts}</dd></div>
-            <div><dt className="text-sm text-slate-400">Timeouts</dt><dd className="mt-2 font-mono text-3xl">{state.timeouts}</dd></div>
-          </dl>
-        </section>
-      )}
-
       <section aria-labelledby="trials-title" className="mt-8">
-        <h2 id="trials-title" className="text-lg font-medium">Trial log</h2>
+        <h2 id="trials-title" className="text-lg font-medium">Attempt log</h2>
         <ol className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
-          {Array.from({ length: 5 }, (_, index) => <li key={index} className="rounded-sm border border-white/10 p-4"><span className="font-mono text-xs text-slate-400">TRIAL {index + 1}</span><p className="mt-2 font-mono text-lg">{state.times[index] === undefined ? <span className="text-sm text-slate-400">Pending</span> : formatTime(state.times[index])}</p></li>)}
+          {Array.from({ length: 5 }, (_, index) => <li key={index} className="rounded-sm border border-white/10 p-4"><span className="font-mono text-xs text-slate-400">ATTEMPT {index + 1}</span><p className="mt-2 font-mono text-lg">{state.attempts[index] === undefined ? <span className="text-sm text-slate-400">Pending</span> : formatTime(attemptScore(state.attempts[index]))}</p>{state.attempts[index] && <p className="mt-2 text-xs leading-5 text-slate-400">{outcomeLabel(state.attempts[index])}</p>}</li>)}
         </ol>
       </section>
-      <p className="mt-6 text-sm text-slate-300">Personal best median: <span className="font-mono text-accent">{best === null ? 'No saved session' : formatTime(best)}</span></p>
-      <p className="mt-2 text-xs leading-6 text-slate-400">Best completed sessions are saved on this browser when local storage is available. False starts and timeouts are counted separately and do not add a time penalty.</p>
+      <p className="mt-6 text-sm text-slate-300">Personal best game score: <span className="font-mono text-accent">{best === null ? 'No saved session' : formatTime(best)}</span></p>
+      <p className="mt-2 text-xs leading-6 text-slate-400">Best completed sessions are saved on this browser when local storage is available. Competitive scoring v2 includes 3,000 ms mistake penalties. Earlier scoring versions are not compared.</p>
     </div>
   );
 }

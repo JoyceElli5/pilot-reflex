@@ -64,7 +64,7 @@ export default function Home() {
             <h1 id="hero-title" className="text-[clamp(3.25rem,7vw,6.5rem)] leading-[.98] font-semibold tracking-[-.065em]">HOW FAST<br />CAN YOU<br /><span className="text-accent">REACT?</span></h1>
             <p className="mt-7 max-w-md text-base leading-7 text-slate-400 sm:text-lg">A split second sparks a decision.<br />Explore your reactions through challenges inspired by the focus of flight.</p>
             <Link href="/challenges/visual-reaction" className="mt-9 inline-flex min-h-14 items-center gap-6 rounded-sm bg-accent px-6 text-sm font-semibold text-[#081219] transition-colors hover:bg-[#a0e7ed]" aria-describedby="launch-note">Start Challenge <span aria-hidden="true">↗</span></Link>
-            <p id="launch-note" className="mt-3 font-mono text-xs text-slate-400">Visual Reaction · Five trials · Ready to play</p>
+            <p id="launch-note" className="mt-3 font-mono text-xs text-slate-400">Visual Reaction · Five attempts · Ready to play</p>
           </div>
           <Instrument />
         </section>
